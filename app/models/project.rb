@@ -1,4 +1,5 @@
 class Project < ApplicationRecord
+  # name属性に関して、空でない+ 1user_idの中においてはnameがuniqueである
   validates :name, presence: true, uniqueness: { scope: :user_id }
 
   belongs_to :owner, class_name: 'User', foreign_key: :user_id
