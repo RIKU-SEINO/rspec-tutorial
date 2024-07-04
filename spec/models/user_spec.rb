@@ -24,7 +24,11 @@ RSpec.describe User, type: :model do
     expect(user.errors[:last_name]).to include("can't be blank")
   end
   # メールアドレスがなければ無効な状態であること
-  it "is invalid without an email address"
+  it "is invalid without an email address" do
+    user = User.new(email: nil)
+    user.valid?
+    expect(user.errors[:email]).to include("can't be blank")
+  end
   # 重複したメールアドレスなら無効な状態であること
   it "is invalid with a duplicate email address" do
     User.create(
