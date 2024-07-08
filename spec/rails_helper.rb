@@ -1,11 +1,7 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
-<<<<<<< HEAD
 require File.expand_path('../config/environment', __dir__)
-=======
-require_relative '../config/environment'
->>>>>>> my-02-setup
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
@@ -31,12 +27,8 @@ Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f 
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
-<<<<<<< HEAD
   puts e.to_s.strip
   exit 1
-=======
-  abort e.to_s.strip
->>>>>>> my-02-setup
 end
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
@@ -62,11 +54,7 @@ RSpec.configure do |config|
   #     end
   #
   # The different available types are documented in the features, such as in
-<<<<<<< HEAD
   # https://relishapp.com/rspec/rspec-rails/docs
-=======
-  # https://rspec.info/features/6-0/rspec-rails
->>>>>>> my-02-setup
   config.infer_spec_type_from_file_location!
 
   # Filter lines from Rails gems in backtraces.
