@@ -1,49 +1,65 @@
 require 'rails_helper'
 
 RSpec.describe "Tasks", type: :system do
-  let(:user) { FactoryBot.create(:user) }
-  let(:project) {
-    FactoryBot.create(:project,
-      name: "RSpec tutorial",
-      owner: user)
-  }
-  let!(:task) { project.tasks.create!(name: "Finish RSpec tutorial") }
-
   scenario "user toggles a task", js: true do
-    sign_in user
-    go_to_project "RSpec tutorial"
+    user = FactoryBot.create(:user)
+    project = FactoryBot.create(:project, name: "RSpec Tutorial", owner: user)
+    task = project.tasks.create!(name: "Finish RSpec Tutorial")
 
-    complete_task "Finish RSpec tutorial"
-    expect_complete_task "Finish RSpec tutorial"
-
-    undo_complete_task "Finish RSpec tutorial"
-    expect_incomplete_task "Finish RSpec tutorial"
-  end
-
-  def go_to_project(name)
     visit root_path
-    click_link name
+    click_link "Sign in"
+    fill_in "Email", with: user.email
+    fill_in "Password", with: user.password
+    click_button "Log in"
+
+    click_link "RSpec Tutorial"
+    check "Finish RSpec Tutorial"
+
+    expect(page).to have_css "label#task_#{task.id}.completed"
+    expect(task.reload).to be_completed
+
+    uncheck "Finish RSpec Tutorial"
+    expect(page).to_not have_css "label#task_#{task.id}.completed"
+    expect(task.reload).to_not be_completed
   end
 
-  def complete_task(name)
-    check name
+  scenario "user adds a task" do
+    user = FactoryBot.create(:user)
+    project = FactoryBot.create(:project, name: "RSpec Tutorial", owner: user)
+
+    visit root_path
+    click_link "Sign in"
+    fill_in "Email", with: user.email
+    fill_in "Password", with: user.password
+    click_button "Log in"
+
+    click_link "RSpec Tutorial"
+
+    expect {
+      click_link "Add Task"
+      fill_in "Name", with: "Finish RSpec Tutorial"
+      click_button "Create Task"
+      expect(page).to have_css "tr.task"
+    }.to change(project.tasks, :count).by(1)
   end
 
-  def undo_complete_task(name)
-    uncheck name
-  end
+  scenario "user deletes a task", js: true do
+    user = FactoryBot.create(:user)
+    project = FactoryBot.create(:project, name: "RSpec Tutorial", owner: user)
+    task = project.tasks.create!(name: "Finish RSpec Tutorial")
 
-  def expect_complete_task(name)
-    aggregate_failures do
-      expect(page).to have_css "label.completed", text: name
-      expect(task.reload).to be_completed
-    end
-  end
+    visit root_path
+    click_link "Sign in"
+    fill_in "Email", with: user.email
+    fill_in "Password", with: user.password
+    click_button "Log in"
 
-  def expect_incomplete_task(name)
-    aggregate_failures do
-      expect(page).to_not have_css "label.completed", text: name
-      expect(task.reload).to_not be_completed
-    end
+    click_link "RSpec Tutorial"
+
+    expect {
+      click_link "Delete"
+      page.driver.browser.switch_to.alert.accept
+      expect(page).to_not have_css "tr.task"
+    }.to change(project.tasks, :count).by(-1)
   end
 end
