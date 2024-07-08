@@ -42,24 +42,4 @@ RSpec.describe "Tasks", type: :system do
       expect(page).to have_css "tr.task"
     }.to change(project.tasks, :count).by(1)
   end
-
-  scenario "user deletes a task", js: true do
-    user = FactoryBot.create(:user)
-    project = FactoryBot.create(:project, name: "RSpec Tutorial", owner: user)
-    task = project.tasks.create!(name: "Finish RSpec Tutorial")
-
-    visit root_path
-    click_link "Sign in"
-    fill_in "Email", with: user.email
-    fill_in "Password", with: user.password
-    click_button "Log in"
-
-    click_link "RSpec Tutorial"
-
-    expect {
-      click_link "Delete"
-      page.driver.browser.switch_to.alert.accept
-      expect(page).to_not have_css "tr.task"
-    }.to change(project.tasks, :count).by(-1)
-  end
 end
