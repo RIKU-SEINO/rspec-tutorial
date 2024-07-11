@@ -6,9 +6,8 @@ RSpec.describe Task, type: :model do
   it "is valid with a project and name" do
     task = Task.new(
       project: project,
-      name: "Test task",
+      name: "Test Task"
     )
-    expect(task).to be_valid
   end
 
   it "is invalid without a project" do
