@@ -6,7 +6,7 @@ RSpec.describe "Projects", type: :system do
     user = FactoryBot.create(:user)
     sign_in user
 
-    visit root_path
+    go_to_projects
 
     expect {
       click_link "New Project"
@@ -27,18 +27,34 @@ RSpec.describe "Projects", type: :system do
     project = FactoryBot.create(:project, name: "RSpec tutorial", owner: user)
     sign_in user
 
+    go_to_projects
+    go_to_edit_project "RSpec tutorial"
+
+    edit_project "Edited RSpec tutorial", description: "Edited Description"
+
+    expect_updated_project "Edited RSpec tutorial"
+  end
+
+  def go_to_projects
     visit root_path
+  end
 
-    click_link "RSpec tutorial"
-
+  def go_to_edit_project(name)
+    visit root_path
+    click_link name
     click_link "Edit"
+  end
 
-    fill_in "Name", with: "Edited RSpec tutorial"
-    fill_in "Description", with: "Edited Description"
-
+  def edit_project(name, description)
+    fill_in "Name", with: name
+    fill_in "Description", with: description
     click_button "Update Project"
+  end
 
-    expect(page).to have_css "div.alert.alert-success", text: "Project was successfully updated."
-    expect(project.reload.name).to eq "Edited RSpec tutorial"
+  def expect_updated_project(name)
+    aggregate_failures do
+      expect(page).to have_css "div.alert.alert-success", text: "Project was successfully updated."
+      expect(page).to have_css "h1.heading", text: name
+    end
   end
 end
