@@ -65,4 +65,9 @@ RSpec.describe Note, type: :model do
     allow(note).to receive(:user).and_return(user)#スタブ
     expect(note.user_name).to eq "Fake User"
   end
+
+  it "has one attached attachment" do
+    note = FactoryBot.create :note, :with_attachment
+    expect(note.attachment).to be_attached
+  end
 end
