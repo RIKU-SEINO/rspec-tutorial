@@ -35,6 +35,26 @@ RSpec.describe "Projects", type: :system do
     expect_updated_project "Edited RSpec tutorial"
   end
 
+  scenario "user completes a project" do
+    # プロジェクトを持ったユーザーを準備
+    user = FactoryBot.create(:user)
+    project = FactoryBot.create(:project, name: "Rspec tutorial", owner: user)
+    #　ユーザーはログインしている
+    sign_in user
+    # ユーザーがプロジェクト画面を開く
+    visit project_path(project)
+    # この時点でCompletedでないことを確認
+    expect(page).to_not have_content "Completed"
+    # completeボタンをクリックして、
+    click_button "Complete"
+    # プロジェクトは完了済みとしてマークされる
+    
+    expect(project.reload.completed?).to be true
+    expect(page).to have_content "Congratulations, this project is complete!"
+    expect(page).to have_content "Completed"
+    expect(page).to_not have_button "Complete"
+  end
+
   def go_to_projects
     visit root_path
   end
