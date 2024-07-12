@@ -55,6 +55,22 @@ RSpec.describe "Projects", type: :system do
     expect(page).to_not have_button "Complete"
   end
 
+  scenario "completed projects are not displayed" do
+    # プロジェクトを持ったユーザーを準備
+    user = FactoryBot.create(:user)
+    project = FactoryBot.create(:project, name: "Rspec tutorial", owner: user)
+    # ユーザーはログインしている
+    sign_in user
+    # ユーザーがプロジェクトAの画面を開く
+    visit project_path(project)
+    # プロジェクトAを完了させる
+    click_button "Complete"
+    # プロジェクト一覧ページをvisit
+    visit root_path
+    # プロジェクト一覧ページに、プロジェクトAが存在しないことを確認
+    expect(page).to_not have_css("a[href='#{project_path(project.id)}']", text: project.name)
+  end
+
   def go_to_projects
     visit root_path
   end
